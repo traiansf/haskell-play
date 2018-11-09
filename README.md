@@ -1,0 +1,2 @@
+# haskell-play
+Exploring Haskell
