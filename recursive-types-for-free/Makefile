@@ -1,6 +1,6 @@
-all: recursion.pdf README.md
+all: recursive-types-for-free.pdf README.md
 
-README.md: recursion.lhs
+README.md: recursive-types-for-free.lhs
 	pandoc $<  -o $@
 
 %.pdf: %.lhs
