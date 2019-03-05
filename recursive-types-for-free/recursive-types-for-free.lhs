@@ -234,7 +234,7 @@ When is the greatest fix point actually final?
 ----------------------------------------------
 
 ```
-        alg                           unfold alg     
+        alg                           unfold alg
   X ----------> f X                X -----------> GFix f
   |              |                 |                |
   |              |                 |                |
