@@ -221,6 +221,21 @@ weakInitialAlgebraInv :: Functor f => CoAlgebra f (LFix f)
 weakInitialAlgebraInv = fold (fmap weakInitialAlgebra)
 ```
 
+                  f (LFix f) -------------> LFix f   
+                     |        wInitialAlg     |    
+                     |                        |    
+    f wInitialAlgInv |                        | wInitialAlgInv
+                     |                        |
+                     v        f wInitialAlg   v
+                f (f (LFix f)) ----------> f (LFix f)
+                     |                        |    
+                     |                        |    
+       f wInitialAlg |                        | wInitialAlg
+                     |                        |
+                     v        wInitialAlg     v
+                 f (LFix f) --------------> LFix f
+                         
+
 Greatest fix points as (weak) final co-algebras
 -----------------------------------------------
 
@@ -262,8 +277,6 @@ When is the greatest fix point actually final?
             alg'                          unfold alg'
 
 ``` {.sourceCode .literate .haskell}
--- unfold weakFinalCoAlgebra = id ?
-
 weakFinalCoAlgebraInv :: Functor f => Algebra f (GFix f)
 weakFinalCoAlgebraInv = unfold (fmap weakFinalCoAlgebra)
 ```
@@ -272,10 +285,8 @@ Streams as a greatest fix point
 -------------------------------
 
 ``` {.sourceCode .literate .haskell}
-data StreamF a x = SCons { headF :: a, tailF :: x }  deriving Functor
-```
-
-``` {.sourceCode .literate .haskell}
+data StreamF a x = SCons { headF :: a, tailF :: x }
+   deriving Functor
 type Stream a = GFix (StreamF a)
 ```
 
@@ -313,11 +324,11 @@ Introducing the recursion schemes `Fix` construction
 
 ``` {.sourceCode .literate .haskell}
 newtype Fix f where
-  Fix :: f (Fix f) -> Fix f
+  Fix :: f (Fix f) -> Fix f  -- Fix is an f-algebra
 ```
 
 ``` {.sourceCode .literate .haskell}
-unFix :: Fix f -> f (Fix f)
+unFix :: Fix f -> f (Fix f)  -- unFix is an f-coalgebra
 unFix (Fix x) = x
 ```
 

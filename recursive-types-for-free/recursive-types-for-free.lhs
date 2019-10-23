@@ -200,6 +200,20 @@ its inverse is:
 > weakInitialAlgebraInv = fold (fmap weakInitialAlgebra)
 
 ```
+              f (LFix f) -------------> LFix f   
+                 |        wInitialAlg     |    
+                 |                        |    
+f wInitialAlgInv |                        | wInitialAlgInv
+                 |                        |
+                 v        f wInitialAlg   v
+            f (f (LFix f)) ----------> f (LFix f)
+                 |                        |    
+                 |                        |    
+   f wInitialAlg |                        | wInitialAlg
+                 |                        |
+                 v        wInitialAlg     v
+             f (LFix f) --------------> LFix f
+                     
 ```
   
  
@@ -246,8 +260,6 @@ h |              | F h  implies  h |                | id
 ```
 
 
-> -- unfold weakFinalCoAlgebra = id ?
-> 
 > weakFinalCoAlgebraInv :: Functor f => Algebra f (GFix f)
 > weakFinalCoAlgebraInv = unfold (fmap weakFinalCoAlgebra)
 
@@ -255,8 +267,8 @@ h |              | F h  implies  h |                | id
 Streams as a greatest fix point
 -------------------------------
 
-> data StreamF a x = SCons { headF :: a, tailF :: x }  deriving Functor
-
+> data StreamF a x = SCons { headF :: a, tailF :: x }
+>    deriving Functor
 > type Stream a = GFix (StreamF a)
 
 > headS :: Stream a -> a
@@ -282,9 +294,9 @@ Introducing the recursion schemes `Fix` construction
 ----------------------------------------------------
 
 > newtype Fix f where
->   Fix :: f (Fix f) -> Fix f
+>   Fix :: f (Fix f) -> Fix f  -- Fix is an f-algebra
 
-> unFix :: Fix f -> f (Fix f)
+> unFix :: Fix f -> f (Fix f)  -- unFix is an f-coalgebra
 > unFix (Fix x) = x
 
 > cata :: Functor f => Algebra f a -> Fix f -> a
@@ -305,6 +317,11 @@ Relating `Fix` with `LFix` and `GFix`
 
 > fixToLFix :: Functor f => Fix f -> LFix f
 > fixToLFix = cata weakInitialAlgebra
+
+```
+fold Fix . cata weakInitialAlgebra
+= Fix . fmap (fold Fix . cata weakInitialAlgebra) . unFix
+```
 
 > fixToGFix :: Functor f => Fix f -> GFix f
 > fixToGFix = unfold unFix
