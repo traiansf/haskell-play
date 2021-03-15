@@ -27,12 +27,11 @@ impLanguageDef =
         [ "while"
         , "if"
         , "else"
-        , "int"
-        , "bool"
         , "true"
         , "false"
         , "read"
         , "print"
+        , "var"
         ]
     , reservedOpNames =
         [ "+", "-", "*", "/", "%"
@@ -126,16 +125,13 @@ statement =
     <|> readStmt
     <|> printStmt
 
-typeP :: Parser Type
-typeP =
-    (reserved "int" >> return TInt)
-    <|> (reserved "bool" >> return TBool)
-
 declStmt :: Parser Stmt
 declStmt = do
-    t <- typeP
+    reserved "var"
     x <- identifier
-    return (Decl t x)
+    reservedOp "="
+    e <- expression
+    return (Decl x e)
 
 expression :: Parser Exp
 expression = buildExpressionParser operators term

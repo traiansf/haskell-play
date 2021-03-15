@@ -6,6 +6,13 @@ import qualified Data.Map.Strict as Map
 
 import AST
 
+data Type = TInt | TBool
+  deriving (Eq)
+
+instance Show Type where
+    show TInt = "int"
+    show TBool = "bool"
+
 type CheckerState = Map Name Type
 
 emptyCheckerState :: CheckerState
@@ -75,12 +82,14 @@ checkStmt (While e s) = do
     t <- checkExp e
     expect TBool t e
     checkStmt s
-checkStmt (Decl _ _) = return ()
+checkStmt (Decl _ _) = do
+    return ()
 checkStmt (Block ss) = checkBlock ss
 
 checkBlock :: [Stmt] -> M ()
 checkBlock [] = return ()
-checkBlock (Decl t x : ss) =
+checkBlock (Decl x e : ss) = do
+    t <- checkExp e
     local (Map.insert x t) (checkBlock ss)
 checkBlock (s : ss) = checkStmt s >> checkBlock ss
 

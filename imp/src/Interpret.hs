@@ -113,13 +113,15 @@ evalStmt (Read s x) = do
 evalStmt (Print s e) = do
     IVal i <- evalExp e
     liftIO (putStrLn (s <> show i))
-evalStmt (Decl t x) = modify' declare
+evalStmt (Decl x e) = do
+    v <- evalExp e
+    modify' (declare v)
   where
-    declare st = ImpState env' store' nextLoc'
+    declare v st = ImpState env' store' nextLoc'
       where
         l = nextLoc st
         nextLoc' = 1 + nextLoc st
-        store' = Map.insert l (defaultValue t) (store st)
+        store' = Map.insert l v (store st)
         env' = Map.insert x l (env st)
 evalStmt (Block sts) = do
     oldEnv <- gets env
@@ -128,9 +130,3 @@ evalStmt (Block sts) = do
 
 evalPgm :: [Stmt] -> IO ((), ImpState)
 evalPgm sts = runM $ mapM_ evalStmt sts
-
-defaultValue :: Type -> Value
-defaultValue TInt = IVal 0
-defaultValue TBool = BVal False
-
-    

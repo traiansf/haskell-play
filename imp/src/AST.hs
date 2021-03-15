@@ -58,13 +58,6 @@ addParens :: String -> String
 addParens e = "(" <> e <> ")"
 
 
-data Type = TInt | TBool
-  deriving (Eq)
-
-instance Show Type where
-    show TInt = "int"
-    show TBool = "bool"
-
 data Stmt
     = Asgn Name Exp
     | If Exp Stmt Stmt
@@ -72,5 +65,5 @@ data Stmt
     | Print String Exp
     | While Exp Stmt
     | Block [Stmt]
-    | Decl Type Name
+    | Decl Name Exp
   deriving (Show)
