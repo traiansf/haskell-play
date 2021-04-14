@@ -1,6 +1,8 @@
 module Checker where
 
+import Control.Monad.Except
 import Control.Monad.Reader
+    ( runReader, when, asks, Reader, MonadReader(local) )
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
@@ -18,13 +20,13 @@ type CheckerState = Map Name Type
 emptyCheckerState :: CheckerState
 emptyCheckerState = Map.empty 
 
-type M = ReaderT CheckerState IO
+type M = ExceptT String (Reader CheckerState)
 
 lookupM :: Name -> M Type
 lookupM x = do
     ot <- asks (Map.lookup x)
     case ot of
-        Nothing -> error $ "Variable " <> x <> " not declared"
+        Nothing -> throwError $ "Variable " <> x <> " not declared"
         Just t -> return t
 
 checkExp :: Exp -> M Type
@@ -82,8 +84,7 @@ checkStmt (While e s) = do
     t <- checkExp e
     expect TBool t e
     checkStmt s
-checkStmt (Decl _ _) = do
-    return ()
+checkStmt (Decl _ _) = return ()
 checkStmt (Block ss) = checkBlock ss
 
 checkBlock :: [Stmt] -> M ()
@@ -96,9 +97,12 @@ checkBlock (s : ss) = checkStmt s >> checkBlock ss
 expect :: (Show t, Eq t, Show e) => t -> t -> e -> M ()
 expect tExpect tActual e =
     when (tExpect /= tActual)
-        (error
+        (throwError
         $ "Type mismatch. Expected " <> show tExpect <> " but got " <> show tActual
         <> " for " <> show e)
 
 checkPgm :: [Stmt] -> IO ()
-checkPgm pgm = runReaderT (checkBlock pgm) emptyCheckerState
+checkPgm pgm =
+    case runReader (runExceptT (checkBlock pgm)) emptyCheckerState of
+        Left err -> error err
+        Right _ -> return ()

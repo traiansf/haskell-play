@@ -130,3 +130,15 @@ evalStmt (Block sts) = do
 
 evalPgm :: [Stmt] -> IO ((), ImpState)
 evalPgm sts = runM $ mapM_ evalStmt sts
+
+pFact= Block [
+       Decl "n" (I 0),
+       Read "n=" "n",
+       Decl "fact" (Id "n"),
+       Decl "i" (I 1),
+       While (BinE Neq  (Id "n") (Id "i")) 
+                (Block [ Asgn "fact" (BinA Mul (Id "fact") (Id "i")),
+                       Asgn "i" (BinA Add (Id "i") (I 1))
+                       ]),
+        Print "fact= " (Id "fact")
+              ]

@@ -1,6 +1,6 @@
 module Term where
 
-import Variable
+import Variable ( Variable, var, freshVariable )
 import Nice
 import Data.List ( nub )
 
@@ -130,8 +130,26 @@ callByNameReduce (App t1 t2)
     r1 = callByNameReduce t1
 callByNameReduce (Lam var t) = Lam var t
 
+-- Normal order reduction
+-- - like call by name
+-- - but also reduce under lambda abstractions if no application is possible
+-- - guarantees reaching a normal form if it exists
+normalReduceStep :: Term -> Maybe Term
+normalReduceStep (App (Lam v t) t2) = Just $ subst t2 v t
+normalReduceStep (App t1 t2)
+  | Just t1' <- normalReduceStep t1 = Just $ App t1' t2
+  | Just t2' <- normalReduceStep t2 = Just $ App t1 t2'
+normalReduceStep (Lam x t)
+  | Just t' <- normalReduceStep t = Just $ Lam x t'
+normalReduceStep _ = Nothing
+
+normalReduce :: Term -> Term
+normalReduce t
+  | Just t' <- normalReduceStep t = normalReduce t'
+  | otherwise = t
+
 reduce :: Term -> Term
-reduce = strictReduce
+reduce = normalReduce
 
 evaluate :: String -> String
 evaluate s = showNice (reduce t)

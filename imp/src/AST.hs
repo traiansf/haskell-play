@@ -3,33 +3,45 @@ module AST where
 type Name = String
 
 data BinAop = Add | Mul | Sub | Div | Mod
+  deriving (Show)
 
+{-
 instance Show BinAop where
     show Add = "+"
     show Mul = "*"
     show Sub = "-"
     show Div = "/"
     show Mod = "%"
+-}
 
 data BinCop = Lt | Lte | Gt | Gte
+  deriving (Show)
 
+{-
 instance Show BinCop where
     show Lt = "<"
     show Lte = "<="
     show Gt = ">"
     show Gte = ">="
+-}
 
 data BinEop = Eq | Neq
+  deriving (Show)
 
+{-
 instance Show  BinEop where
     show Eq = "=="
     show Neq = "!="
+-}
 
 data BinLop = And | Or
+  deriving (Show)
 
+{-
 instance Show BinLop where
     show And = "&&"
     show Or = "||"
+-}
 
 data Exp
     = Id Name
@@ -41,7 +53,9 @@ data Exp
     | BinE BinEop Exp Exp
     | BinL BinLop Exp Exp
     | Not Exp
+    deriving (Show)
 
+{-
 instance Show Exp where
     show (Id x) = x
     show (I i) = show i
@@ -53,6 +67,7 @@ instance Show Exp where
     show (BinE op e1 e2) = show e1 <> show op <> show e2
     show (BinL op e1 e2) = addParens $ show e1 <> show op <> show e2
     show (Not e) = "!" <> show e
+-}
 
 addParens :: String -> String
 addParens e = "(" <> e <> ")"

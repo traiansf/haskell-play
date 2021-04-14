@@ -15,6 +15,7 @@ main = do
     when (null args) (error "Need file to run")
     let (file:_) = args
     pgm <- loadProgramFromFile file
+    print pgm
     checkPgm pgm
     (_, st) <- evalPgm pgm
     putStrLn $ showImpState st
