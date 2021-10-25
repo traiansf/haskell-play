@@ -1,8 +1,42 @@
-module Term where
+module Lambda where
 
-import Variable ( Variable, var, freshVariable )
-import Nice
+import Data.Char (isLetter)
 import Data.List ( nub )
+
+class ShowNice a where
+    showNice :: a -> String
+
+class ReadNice a where
+    readNice :: String -> (a, String)
+
+data Variable
+  = Variable
+  { name :: String
+  , count :: Int
+  }
+  deriving (Show, Eq, Ord)
+
+var :: String -> Variable
+var x = Variable x 0
+
+instance ShowNice Variable where
+    showNice (Variable x 0) = x
+    showNice (Variable x cnt) = x <> "_" <> show cnt
+
+instance ReadNice Variable where
+    readNice s
+      | null x = error $ "expected variable but found " <> s
+      | otherwise = (var x, s')
+      where
+        (x, s') = span isLetter s
+
+freshVariable :: Variable -> [Variable] -> Variable
+freshVariable var vars = Variable x (cnt + 1)
+  where
+    x = name var
+    varsWithName = filter ((== x) . name) vars
+    Variable _ cnt = maximum (var : varsWithName)
+
 
 data Term
   = V Variable
@@ -86,50 +120,6 @@ subst u x (Lam y t)
     allFV = nub ([x] ++ fvU ++ fvT)
     y' = freshVariable y allFV
 
--- Strict / Eager evaluation
--- - make sure operands are always evaluated before evaluating expression
--- - evaluates inside lambda abstractions
-strictReduce :: Term -> Term
-strictReduce (V x) = V x
-strictReduce (App t1 t2)
-  | Lam v t <- r1 = strictReduce (subst r2 v t)
-  | otherwise = App r1 r2
-  where
-    r1 = strictReduce t1
-    r2 = strictReduce t2
-strictReduce (Lam var t) = Lam var (strictReduce t)
-
--- alpha-beta equivalence (for strongly normalizing terms) is obtained by
--- fully evaluating the terms using beta-reduction, then checking their
--- alpha-equivalence.
-abEq :: Term -> Term -> Bool
-abEq t1 t2 = aEq (reduce t1) (reduce t2)
-
--- Call by value
--- - make sure operands are always evaluated before evaluating expression
--- - never reduce under a lambda-abstraction (it's already a value)
-callByValueReduce :: Term -> Term
-callByValueReduce (V x) = V x
-callByValueReduce (App t1 t2)
-  | Lam v t <- r1 = callByValueReduce (subst r2 v t)
-  | otherwise = App r1 r2
-  where
-    r1 = callByValueReduce t1
-    r2 = callByValueReduce t2
-callByValueReduce (Lam var t) = Lam var t
-
--- Call by name
--- - never evaluate right-hand-side of an application
--- - never reduce under a lambda-abstraction (it's already a value)
-callByNameReduce :: Term -> Term
-callByNameReduce (V x) = V x
-callByNameReduce (App t1 t2)
-  | Lam v t <- r1 = callByNameReduce (subst t2 v t)
-  | otherwise = App r1 t2
-  where
-    r1 = callByNameReduce t1
-callByNameReduce (Lam var t) = Lam var t
-
 -- Normal order reduction
 -- - like call by name
 -- - but also reduce under lambda abstractions if no application is possible
@@ -151,7 +141,14 @@ normalReduce t
 reduce :: Term -> Term
 reduce = normalReduce
 
+-- alpha-beta equivalence (for strongly normalizing terms) is obtained by
+-- fully evaluating the terms using beta-reduction, then checking their
+-- alpha-equivalence.
+abEq :: Term -> Term -> Bool
+abEq t1 t2 = aEq (reduce t1) (reduce t2)
+
 evaluate :: String -> String
 evaluate s = showNice (reduce t)
   where
     (t, "") = readNice s
+

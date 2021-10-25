@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4fe69330bfa78ee23e542235845d7292e81528db62ca8e3c247c4647af6abefd
+-- hash: ded5b6471d9319ce7654563b2b5d8bae11f8485758fd0f59c09b9f916701aaf1
 
 name:           lambda
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Church
+      Lambda
       Nice
       Term
       Variable
