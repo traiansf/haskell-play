@@ -26,10 +26,10 @@ A morphism between `(X,k)` and `(X',k')` is given by an arrow `h : X -> X'`
 such that the following diagram commutes.
 
 ```
-	                     k            
-	             F X ----------> X   
-	              |              |    
-	              |              |    
+	                     k
+	             F X ----------> X
+	              |              |
+	              |              |
 (1)	          F h |              | h
 	              |              |
 	              v              v
@@ -50,10 +50,10 @@ A morphism between `(X,k)` and `(X',k')` is given by an arrow `h : X -> X'`
 such that the following diagram commutes.
 
 ```
-	                   k            
-	            X ----------> F X   
-	            |              |    
-	            |              |    
+	                   k
+	            X ----------> F X
+	            |              |
+	            |              |
 	          h |              | F h
 	            |              |
 	            v              v
@@ -87,10 +87,10 @@ Least-fixpoints as (weak) initial algebras
 >   LFix { unLFix :: (forall x . Algebra f x -> x) }
 
 ```
-                          wInitialAlg           
-               f (LFix f) ----------> LFix f   
-                    |                   |    
-                    |                   |    
+                          wInitialAlg
+               f (LFix f) ----------> LFix f
+                    |                   |
+                    |                   |
 fmap (fold algebra) |                   | fold algebra
                     |                   |
                     v                   v
@@ -109,10 +109,10 @@ Morphism condition for `fold algebra`
 -------------------------------------
 
 ```
-                          wInitialAlg           
-               f (LFix f) ----------> LFix f   
-                    |                   |    
-                    |                   |    
+                          wInitialAlg
+               f (LFix f) ----------> LFix f
+                    |                   |
+                    |                   |
 fmap (fold algebra) |                   | fold algebra
                     |                   |
                     v                   v
@@ -184,7 +184,7 @@ f h |              | h   implies   id |                | h
    f X' ---------> X'               LFix f ----------> X'
            alg'                             fold alg'
 
-h: (X,alg) -> (X',alg')  implies  h . fold alg == fold alg
+h: (X,alg) -> (X',alg')  implies  h . fold alg == fold alg'
 ```
 
 Additionally, `fold weakInitialAlgebra == id`
@@ -200,23 +200,21 @@ its inverse is:
 > weakInitialAlgebraInv = fold (fmap weakInitialAlgebra)
 
 ```
-              f (LFix f) -------------> LFix f   
-                 |        wInitialAlg     |    
-                 |                        |    
+              f (LFix f) -------------> LFix f
+                 |        wInitialAlg     |
+                 |                        |
 f wInitialAlgInv |                        | wInitialAlgInv
                  |                        |
                  v        f wInitialAlg   v
             f (f (LFix f)) ----------> f (LFix f)
-                 |                        |    
-                 |                        |    
+                 |                        |
+                 |                        |
    f wInitialAlg |                        | wInitialAlg
                  |                        |
                  v        wInitialAlg     v
              f (LFix f) --------------> LFix f
-                     
+
 ```
-  
- 
 
 
 
@@ -229,13 +227,13 @@ Greatest fix points as (weak) final co-algebras
 ```
                      coalg
               X -------------> f X
-              |                 |    
-              |                 |    
+              |                 |
+              |                 |
  unfold coalg |                 | f (unfold coalg)
               |                 |
               |                 |
-           GFix f ----------> f (GFix f)   
-                  wFinalCoalg                    
+           GFix f ----------> f (GFix f)
+                  wFinalCoalg
 ```
 
 > unfold :: CoAlgebra f a -> a -> GFix f
